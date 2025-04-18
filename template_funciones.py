@@ -43,19 +43,39 @@ def calculaLU(matriz):
     
     return [L,U]
 
+def nr_matriz_c(A):
+    # A: Matriz de adyacencia
+    m = A.shape[0]
+    K = np.zeros((m, m))
+    cantidad_museos = A.shape[1]
+    for i in range(0, cantidad_museos):
+        grado = 0
+        for elem in A[i]:
+            if elem != 0:
+                grado += 1
+        K[i,i] = grado
+    
+    Kinv = np.linalg.inv(K)
+    C = A.T @ Kinv
+    return C
+        
 def calcula_matriz_C(A): 
     # Función para calcular la matriz de trancisiones C
     # A: Matriz de adyacencia
     # Retorna la matriz C
-    m = A.len()
+    cantidad_museos = A.shape[1]
+
+    # Corregir: columa apunta a fila, luego puede k puede tomar cualquier valor
     k = 0
     for elem in A[1]:
         if elem != 0:
             k += 1
+
     # Calcula inversa de la matriz K, que tiene en su diagonal la suma por filas de A
-    K = np.eye(m)
-    Kinv = np.fill_diagonal(K, 1/k)# Calcula inversa de la matriz K, que tiene en su diagonal la suma por filas de A
-    C = (Kinv@A).T # Calcula C multiplicando Kinv y A
+    K = np.eye(cantidad_museos)
+    # Devuelve null, modifica K en sus posiciones.
+    np.fill_diagonal(K, 1/k)# Calcula inversa de la matriz K, que tiene en su diagonal la suma por filas de A
+    C = (K@A).T # Calcula C multiplicando Kinv y A
     return C
 
     
@@ -68,7 +88,7 @@ def calcula_pagerank(A,alfa):
     N = C.shape[0] # Cantidad de nodos
 
     I = np.eye(A.shape[0]) # Matriz identidad
-    M = N/alfa (I-(1-alfa)*C) # Matriz de transiciones
+    M = N/alfa*(I-(1-alfa)*C) # Matriz de transiciones
 
     L, U = calculaLU(M) # Calculamos descomposición LU a partir de C y d
     # Vector de 1s, multiplicado por el coeficiente correspondiente usando d y N.
