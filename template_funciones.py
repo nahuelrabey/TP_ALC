@@ -65,10 +65,15 @@ def calcula_pagerank(A,alfa):
     # d: coeficientes de damping
     # Retorna: Un vector p con los coeficientes de page rank de cada museo
     C = calcula_matriz_C(A)
-    N = ... # Obtenemos el número de museos N a partir de la estructura de la matriz A
-    M = ...
+    N = C.shape[0] # Cantidad de nodos
+
+    I = np.eye(A.shape[0]) # Matriz identidad
+    M = N/alfa (I-(1-alfa)*C) # Matriz de transiciones
+
     L, U = calculaLU(M) # Calculamos descomposición LU a partir de C y d
-    b = ... # Vector de 1s, multiplicado por el coeficiente correspondiente usando d y N.
+    # Vector de 1s, multiplicado por el coeficiente correspondiente usando d y N.
+    b = np.ones((N,1))
+
     Up = scipy.linalg.solve_triangular(L,b,lower=True) # Primera inversión usando L
     p = scipy.linalg.solve_triangular(U,Up) # Segunda inversión usando U
     return p
@@ -91,8 +96,6 @@ def calcula_B(C,cantidad_de_visitas):
     # cantidad_de_visitas: Cantidad de pasos en la red dado por los visitantes. Indicado como r en el enunciado
     # Retorna:Una matriz B que vincula la cantidad de visitas w con la cantidad de primeras visitas v
     B = np.eye(C.shape[0])
-    for i in range(cantidad_de_visitas-1):
+    # for i in range(cantidad_de_visitas-1):
         # Sumamos las matrices de transición para cada cantidad de pasos
-    return B
-
-
+    # return B
