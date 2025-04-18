@@ -43,8 +43,10 @@ def calculaLU(matriz):
     
     return [L,U]
 
-def nr_matriz_c(A):
+def calcula_matriz_C(A): 
+    # Función para calcular la matriz de trancisiones C
     # A: Matriz de adyacencia
+    # Retorna la matriz C
     m = A.shape[0]
     K = np.zeros((m, m))
     cantidad_museos = A.shape[1]
@@ -57,25 +59,6 @@ def nr_matriz_c(A):
     
     Kinv = np.linalg.inv(K)
     C = A.T @ Kinv
-    return C
-        
-def calcula_matriz_C(A): 
-    # Función para calcular la matriz de trancisiones C
-    # A: Matriz de adyacencia
-    # Retorna la matriz C
-    cantidad_museos = A.shape[1]
-
-    # Corregir: columa apunta a fila, luego puede k puede tomar cualquier valor
-    k = 0
-    for elem in A[1]:
-        if elem != 0:
-            k += 1
-
-    # Calcula inversa de la matriz K, que tiene en su diagonal la suma por filas de A
-    K = np.eye(cantidad_museos)
-    # Devuelve null, modifica K en sus posiciones.
-    np.fill_diagonal(K, 1/k)# Calcula inversa de la matriz K, que tiene en su diagonal la suma por filas de A
-    C = (K@A).T # Calcula C multiplicando Kinv y A
     return C
 
     
