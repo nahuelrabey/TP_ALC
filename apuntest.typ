@@ -59,3 +59,41 @@ $
 $
 
 Por lo tanto, se cumplen las condiciones cuando $0 < ga < 1$
+
+=== Punto 4.
+
+Si la matriz $C^k$ representa la probabilidad de que un visitante vaya a un determinado museo, entonces dados dos vectores $v,w$ tales que
+
+$
+  w = C v + v
+$
+
+Decimos que $v_i$ tiene la información de cuantos visitantes hay en el museo $i$, y $w_i$ tendrá la información de cuantos visitantes habrá en el siguiente. Luego
+
+$
+  w = C^2 v + C v + C^0 v
+$
+
+Ahora $w_i$ almacena la información de la cantidad de visitantes que tendrá cada museo en el tercer paso. (tomamos $C^0$ cómo el primero).
+
+$
+  w = C^(r-1)v + dots + v + C v + C^0 v
+$
+Ahora $w_i$ almacena la información de la cantidad de visitantes que tendrá cada museo en el $r-$paso.
+
+Lo anterior es lo mismo que decir
+
+$
+  &w = sum_(k=0)^(r-1) C^k v\
+  &w = (sum_(k=0)^(r-1) C^k) v\
+$
+Luego, si decimos que $B=sum_(k=0)^(r-1) C^k$ nos podemos quedar con la siguiente ecuación.
+$
+  &w = B v\
+$
+
+Finalmente la siguiente es una buena aproximación a la cantidad de visitantes que tuvo inicialmente cada museo.
+$
+  &v = B^(-1) v\
+$
+

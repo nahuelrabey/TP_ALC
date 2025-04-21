@@ -57,7 +57,8 @@ def calcula_matriz_C(A):
                 grado += 1
         K[i,i] = grado
     
-    Kinv = np.linalg.inv(K)
+    Identidad = np.eye(m)
+    Kinv = scipy.linalg.solve_triangular(K,Identidad)
     C = A.T @ Kinv
     return C
 
@@ -88,8 +89,21 @@ def calcula_matriz_C_continua(D):
     D = D.copy()
     F = 1/D
     np.fill_diagonal(F,0)
-    Kinv = ... # Calcula inversa de la matriz K, que tiene en su diagonal la suma por filas de F 
-    C = ... # Calcula C multiplicando Kinv y F
+    #Kinv = Calcula inversa de la matriz K, que tiene en su diagonal la suma por filas de F 
+    m = D.shape[0]
+    K = np.zeros((m,m))
+    for i in range(0, m):
+        grado = 0
+        for elem in F[i]:
+            if elem != 0:
+                grado += 1
+        K[i,i] = grado
+    Identidad = np.eye(m)
+    Kinv = scipy.linalg.solve_triangular(K,Identidad)
+
+    # C = A.T @ Kinv <- Punto anterior
+    # C =  Calcula C multiplicando Kinv y F
+    C = Kinv @ F
     return C
 
 def calcula_B(C,cantidad_de_visitas):
@@ -99,6 +113,11 @@ def calcula_B(C,cantidad_de_visitas):
     # cantidad_de_visitas: Cantidad de pasos en la red dado por los visitantes. Indicado como r en el enunciado
     # Retorna:Una matriz B que vincula la cantidad de visitas w con la cantidad de primeras visitas v
     B = np.eye(C.shape[0])
-    # for i in range(cantidad_de_visitas-1):
+    # B = np.zeros(C.shape[0])
+    for k in  range(1, cantidad_de_visitas):
+        C_elevado = C
+        for j in range(1,k):
+            C_elevado = C_elevado @ C 
+        B += C_elevado
         # Sumamos las matrices de transición para cada cantidad de pasos
-    # return B
+    return B
