@@ -98,6 +98,7 @@ def calcula_matriz_C_continua(D):
             if elem != 0:
                 grado += 1
         K[i,i] = grado
+    
     Identidad = np.eye(m)
     Kinv = scipy.linalg.solve_triangular(K,Identidad)
 
