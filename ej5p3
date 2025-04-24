@@ -1,23 +1,31 @@
-C = func.calcula_matriz_C_continua(D)
-visitas_totales = []
-with open("./visitas.txt", "r") as file:
-  visitas_totales = [float(line.strip()) for line in file]
+"""
+Ejercicio 5 punto 3:
+Buscamos calcular
+v = B_inv @ w
 
-Id = np.eye(len(visitas_totales))
+Nosotros tenemos w
+"""
+
+C = func.calcula_matriz_C_continua(D)
+
+# Leer vector w desde el archivo "visitas.txt"
+w = [] # vector w
+with open("./visitas.txt", "r") as file:
+  w = [float(line.strip()) for line in file]
+
+Id = np.eye(len(w))
 # pasos = np.int64(3)
 r = 3
 B = func.calcula_B(C,r)
 print(type(B))
 ##B_inv = scipy.linalg.solve_triangular(B,Id)  Mal porque se asume injustificadamente que B està triangulada.
+
+# Calculamos LU de B y encontramos la estimación de visitas inciales (v)
 [L,U] = func.calculaLU(B)
-J = scipy.linalg.solve_triangular(L, visitas_totales, lower=True)
+J = scipy.linalg.solve_triangular(L, w, lower=True)
 v = scipy.linalg.solve_triangular(U, J)
-print(C.shape)
-print(B.shape)
-##print(B_inv.shape)
-##visitas_iniciales =  B_inv @ visitas_totales  Mal por arrastar error de calculo de B inversa.
-# DA VALORES NEGATIVOS, TA MAL
-print(v)
+
+# Calculamos norma 1 de v
 v_norma_1 = 0
 for elem in v:
     if elem > 0:

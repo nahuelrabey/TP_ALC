@@ -89,22 +89,22 @@ def calcula_matriz_C_continua(D):
     D = D.copy()
     F = 1/D
     np.fill_diagonal(F,0)
-    #Kinv = Calcula inversa de la matriz K, que tiene en su diagonal la suma por filas de F 
+
+    # Calculamos el grado de F, que en su diagonal tiene la suma por filas de F
     m = D.shape[0]
     K = np.zeros((m,m))
     for i in range(0, m):
         grado = 0
         for elem in F[i]:
-            if elem != 0:
-                grado += 1
+            grado += elem 
         K[i,i] = grado
     
     Identidad = np.eye(m)
+    # K es una matriz diagonal, luego calcular la inversa utilizando solve_triangular vale
     Kinv = scipy.linalg.solve_triangular(K,Identidad)
 
-    # C = A.T @ Kinv <- Punto anterior
     # C =  Calcula C multiplicando Kinv y F
-    C = Kinv @ F
+    C = F.T @ Kinv
     return C
 
 def calcula_B(C,cantidad_de_visitas):
