@@ -85,13 +85,14 @@ def metpot1(A,tol=1e-8,maxrep=np.Inf):
 def deflaciona(A,tol=1e-8,maxrep=np.Inf):
     # Recibe la matriz A, una tolerancia para el método de la potencia, y un número máximo de repeticiones
     v1,l1,_ = metpot1(A,tol,maxrep) # Buscamos primer autovector con método de la potencia
-    deflA = ... # Sugerencia, usar la funcion outer de numpy
+    deflA = A - l1 * np.outer(v1,v1) # Sugerencia, usar la funcion outer de numpy
     return deflA
 
 def metpot2(A,v1,l1,tol=1e-8,maxrep=np.Inf):
    # La funcion aplica el metodo de la potencia para buscar el segundo autovalor de A, suponiendo que sus autovectores son ortogonales
    # v1 y l1 son los primeors autovectores y autovalores de A}
    # Have fun!
+   deflA = A - l1 * np.outer(v1,v1)
    return metpot1(deflA,tol,maxrep)
 
 
