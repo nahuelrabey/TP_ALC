@@ -1,4 +1,6 @@
 import numpy as np
+import scipy
+import scipy.linalg
 # Matriz A de ejemplo
 #A_ejemplo = np.array([
 #    [0, 1, 1, 1, 0, 0, 0, 0],
@@ -85,29 +87,40 @@ def metpot1(A,tol=1e-8,maxrep=np.Inf):
 def deflaciona(A,tol=1e-8,maxrep=np.Inf):
     # Recibe la matriz A, una tolerancia para el método de la potencia, y un número máximo de repeticiones
     v1,l1,_ = metpot1(A,tol,maxrep) # Buscamos primer autovector con método de la potencia
-    deflA = A - l1 * np.outer(v1,v1) # Sugerencia, usar la funcion outer de numpy
+    deflA = A - l1 * np.linalg.outer(v1,v1) # Sugerencia, usar la funcion outer de numpy
     return deflA
 
 def metpot2(A,v1,l1,tol=1e-8,maxrep=np.Inf):
    # La funcion aplica el metodo de la potencia para buscar el segundo autovalor de A, suponiendo que sus autovectores son ortogonales
    # v1 y l1 son los primeors autovectores y autovalores de A}
    # Have fun!
-   deflA = A - l1 * np.outer(v1,v1)
+   deflA = A - l1 * np.linalg.outer(v1,v1)
    return metpot1(deflA,tol,maxrep)
 
 
 def metpotI(A,mu,tol=1e-8,maxrep=np.Inf):
     # Retorna el primer autovalor de la inversa de A + mu * I, junto a su autovector y si el método convergió.
-    return metpot1(...,tol=tol,maxrep=maxrep)
+    I = np.eye(len(A))
+    Amu = A + mu * I
+    L,U = calculaLU(Amu)
+    Linv = scipy.linalg.solve_triangular(L,I, lower= True)
+    Uinv = scipy.linalg.solve_triangular(U,I, lower= False)
+
+    AmuINV = Uinv @ Linv
+    return metpot1(AmuINV,tol=tol,maxrep=maxrep)
 
 def metpotI2(A,mu,tol=1e-8,maxrep=np.Inf):
    # Recibe la matriz A, y un valor mu y retorna el segundo autovalor y autovector de la matriz A, 
    # suponiendo que sus autovalores son positivos excepto por el menor que es igual a 0
    # Retorna el segundo autovector, su autovalor, y si el metodo llegó a converger.
-   X = ... # Calculamos la matriz A shifteada en mu
-   iX = ... # La invertimos
-   defliX = ... # La deflacionamos
-   v,l,_ =  ... # Buscamos su segundo autovector
+   I = np.eye(len(A))
+   X = A + mu * I # Calculamos la matriz A shifteada en mu
+   L, U = calculaLU(X)
+   Linv = scipy.linalg.solve_triangular(L,I, lower= True)
+   Uinv = scipy.linalg.solve_triangular(U,I, lower= False) 
+   iX = Uinv @ Linv # La invertimos
+   defliX = deflaciona(iX) # La deflacionamos
+   v,l,_ =  metpot1(defliX,tol=tol,maxrep=maxrep)# Buscamos su segundo autovector
    l = 1/l # Reobtenemos el autovalor correcto
    l -= mu
    return v,l,_
