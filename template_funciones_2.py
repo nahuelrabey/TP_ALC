@@ -38,50 +38,48 @@ def calcula_R(A):
 
     return R
 
-def calcula_lambda(L,v): #comentario: la funcion cambia ligeramente dependiendo de como sea v. si v es de entrada un vector columna entonces no pasa nada.
-    #comentario: si no entra con dimensiones (n,1) antes  hay que hacer v = v.reshape(-1,1), esto es porque sino v.T no cambia a v como queremos.
+def calcula_lambda(L,v): 
     s = v.copy()
     for i in range(len(s)):
-        if s[i][0] >= 0:
-            s[i][0] = 1
+        if s[i] >= 0:
+            s[i] = 1
         else:
-            s[i][0] = -1
+            s[i] = -1
 
-    lambdon = (1/4 * (s.T @ L @ s))[0,0]                              
+    lambdon = (1/4 * (s.T @ L @ s))                            
     return lambdon
 
 def calcula_Q(R,v):
     # La funcion recibe R y s y retorna la modularidad (a menos de un factor 2E)
-    #comentario: lo mismo que para calcula_lambda
     s = v.copy()
     for i in range(len(s)):
-        if s[i][0] >= 0:
-            s[i][0] = 1
+        if s[i] >= 0:
+            s[i] = 1
         else:
-            s[i][0] = -1
+            s[i] = -1
     
-    Q = s.T@ R @ s[0,0]
+    Q = s.T@ R @ s
     return Q
 
 def metpot1(A,tol=1e-8,maxrep=np.Inf):
    # Recibe una matriz A y calcula su autovalor de mayor módulo, con un error relativo menor a tol y-o haciendo como mucho maxrep repeticiones
-   v = ... # Generamos un vector de partida aleatorio, entre -1 y 1
-   v = ... # Lo normalizamos
-   v1 = ... # Aplicamos la matriz una vez
-   v1 = ... # normalizamos
-   l = ... # Calculamos el autovector estimado
-   l1 = ... # Y el estimado en el siguiente paso
+   v = np.random.uniform(-1,1,size=A.shape[0]) # Generamos un vector de partida aleatorio, entre -1 y 1
+   v = v / np.linalg.norm(v,2) # Lo normalizamos
+   v1 = A @ v # Aplicamos la matriz una vez
+   v1 = v1 / np.linalg.norm(v1,2)  # normalizamos
+   l = (v.T @ A @ v)/(v.T @ v) # Calculamos el autovector estimado
+   l1 = (v1.T @ A @ v1)/(v1.T @ v1) # Y el estimado en el siguiente paso
    nrep = 0 # Contador
    while np.abs(l1-l)/np.abs(l) > tol and nrep < maxrep: # Si estamos por debajo de la tolerancia buscada 
       v = v1 # actualizamos v y repetimos
       l = l1
-      v1 = ... # Calculo nuevo v1
-      v1 = ... # Normalizo
-      l1 = ... # Calculo autovector
+      v1 = A @ v # Calculo nuevo v1
+      v1 = v1/np.linalg.norm(v1,2) # Normalizo
+      l1 = (v1.T @ A @ v1)/(v1.T @ v1) # Calculo autovector
       nrep += 1 # Un pasito mas
    if not nrep < maxrep:
       print('MaxRep alcanzado')
-   l = ... # Calculamos el autovalor
+   l = (v1.T @ A @ v1)/(v1.T @ v1) # Calculamos el autovalor
    return v1,l,nrep<maxrep
 
 def deflaciona(A,tol=1e-8,maxrep=np.Inf):
