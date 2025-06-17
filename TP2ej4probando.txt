@@ -1,0 +1,55 @@
+import template_funciones_2 as tp2
+
+def simetrica_y_binaria(D, m):
+    A = func.construye_adyacencia(D,m)  #Construimos matriz de adyacencia de m conexiones.
+    A = (1/2) * (A + A.T)              #Simetrizamos
+    A = np.ceil(A)                     #La volvemos binaria (0s y 1s) ¿¿¿ Ponemos el .astype(int) ???
+    print(A)
+    return A
+
+A3 = simetrica_y_binaria(D, 3)
+print("La partición de grupos es:")
+print(tp2.modularidad_iterativo(A3))
+
+import matplotlib.colors as pltColores
+
+#Modificando la función antes definida para que grafique nodos coloreados según grupo de pertenencia:
+def graficar_grupos(grupos, ax, titulo):
+    # recibe:
+    #  - grupos: Lista de listas, donde cada sublista tiene los índices de los museos que pertenecen a un mismo grupo.
+    #  - ax (matplotlib.axes.Axes): Eje matplotlib donde dibujar el gráfico.
+    #  - titulo: título del gráfico
+
+    # Lista de muchos colores:
+    colores = list(pltColores.TABLEAU_COLORS.values()) + list(pltColores.CSS4_COLORS.values())
+    
+    # Asignamos colores por nodo
+    color_por_museo = {}
+    for i, grupo in enumerate(grupos):
+        for museo in grupo:
+            color_por_museo[museo] = colores[i % len(colores)]  #El módulo es para volver a repetir colores si la cantidad de grupos fuera aún mayor.
+    
+    # Creamos la lista final en el orden de G.nodes
+    secuencia_colores = [color_por_museo[museo] for museo in G.nodes]
+
+    # fig, ax = plt.subplots(figsize=(15, 15)) # Visualización de la red en el mapa
+    barrios.to_crs("EPSG:22184").boundary.plot(color='gray',ax=ax) # Graficamos Los barrios
+    nx.draw_networkx(G,G_layout, node_color=secuencia_colores, ax=ax,with_labels=False) # Graficamos red
+    ax.set_title(titulo)
+  # plt.show()
+
+
+conecciones = [3,5,10,50]
+alpha = 1/5
+fig, axs = plt.subplots(2,2, figsize=(15, 15))
+axs = axs.flatten()
+for i in range(len(conecciones)):
+    m = conecciones[i]
+    ax = axs[i]
+    A = simetrica_y_binaria(D, m)
+    grupos = tp2.modularidad_iterativo(A)
+    titulo = f"Visualización de los subgrupos en la red, con museos con {m} conecciones"
+    graficar_grupos(grupos, ax, titulo)
+    print(f"{len(grupos)} grupos detectados para m = {m}")
+
+plt.show()
