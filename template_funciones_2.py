@@ -174,8 +174,7 @@ def modularidad_iterativo(A=None,R=None,nombres_s=None):
     if R.shape[0] == 1: # Si llegamos al último nivel
         return [nombres_s]
     else:
-        v0,l0,_0 = metpot1(A)
-        v,l,_ = metpot2(A,v0,l0) # Primer autovector y autovalor de R
+        v,l,_ = metpot1(R) # Primer autovector y autovalor de R
         # Modularidad Actual:
         Q0 = np.sum(R[v>0,:][:,v>0]) + np.sum(R[v<0,:][:,v<0])
         if Q0<=0 or all(v>0) or all(v<0): # Si la modularidad actual es menor a cero, o no se propone una partición, terminamos
