@@ -1,17 +1,18 @@
 import numpy as np
 import scipy
-import scipy.linalg
+import template_funciones as tp1
+import numpy.linalg
 # Matriz A de ejemplo
-#A_ejemplo = np.array([
-#    [0, 1, 1, 1, 0, 0, 0, 0],
-#    [1, 0, 1, 1, 0, 0, 0, 0],
-#    [1, 1, 0, 1, 0, 1, 0, 0],
-#    [1, 1, 1, 0, 1, 0, 0, 0],
-#    [0, 0, 0, 1, 0, 1, 1, 1],
-#    [0, 0, 1, 0, 1, 0, 1, 1],
-#    [0, 0, 0, 0, 1, 1, 0, 1],
-#    [0, 0, 0, 0, 1, 1, 1, 0]
-#])
+A_ejemplo = np.array([
+    [0, 1, 1, 1, 0, 0, 0, 0],
+    [1, 0, 1, 1, 0, 0, 0, 0],
+    [1, 1, 0, 1, 0, 1, 0, 0],
+    [1, 1, 1, 0, 1, 0, 0, 0],
+    [0, 0, 0, 1, 0, 1, 1, 1],
+    [0, 0, 1, 0, 1, 0, 1, 1],
+    [0, 0, 0, 0, 1, 1, 0, 1],
+    [0, 0, 0, 0, 1, 1, 1, 0]
+])
 
 
 def calcula_L(A):
@@ -87,14 +88,14 @@ def metpot1(A,tol=1e-8,maxrep=np.Inf):
 def deflaciona(A,tol=1e-8,maxrep=np.Inf):
     # Recibe la matriz A, una tolerancia para el método de la potencia, y un número máximo de repeticiones
     v1,l1,_ = metpot1(A,tol,maxrep) # Buscamos primer autovector con método de la potencia
-    deflA = A - l1 * np.linalg.outer(v1,v1) # Sugerencia, usar la funcion outer de numpy
+    deflA = A - l1 * np.outer(v1,v1) # Sugerencia, usar la funcion outer de numpy
     return deflA
 
 def metpot2(A,v1,l1,tol=1e-8,maxrep=np.Inf):
    # La funcion aplica el metodo de la potencia para buscar el segundo autovalor de A, suponiendo que sus autovectores son ortogonales
    # v1 y l1 son los primeors autovectores y autovalores de A}
    # Have fun!
-   deflA = A - l1 * np.linalg.outer(v1,v1)
+   deflA = A - l1 * np.outer(v1,v1)
    return metpot1(deflA,tol,maxrep)
 
 
@@ -102,7 +103,7 @@ def metpotI(A,mu,tol=1e-8,maxrep=np.Inf):
     # Retorna el primer autovalor de la inversa de A + mu * I, junto a su autovector y si el método convergió.
     I = np.eye(len(A))
     Amu = A + mu * I
-    L,U = calculaLU(Amu)
+    L,U = tp1.calculaLU(Amu)
     Linv = scipy.linalg.solve_triangular(L,I, lower= True)
     Uinv = scipy.linalg.solve_triangular(U,I, lower= False)
 
@@ -115,7 +116,7 @@ def metpotI2(A,mu,tol=1e-8,maxrep=np.Inf):
    # Retorna el segundo autovector, su autovalor, y si el metodo llegó a converger.
    I = np.eye(len(A))
    X = A + mu * I # Calculamos la matriz A shifteada en mu
-   L, U = calculaLU(X)
+   L, U = tp1.calculaLU(X)
    Linv = scipy.linalg.solve_triangular(L,I, lower= True)
    Uinv = scipy.linalg.solve_triangular(U,I, lower= False) 
    iX = Uinv @ Linv # La invertimos
@@ -136,10 +137,19 @@ def laplaciano_iterativo(A,niveles,nombres_s=None):
         return([nombres_s])
     else: # Sino:
         L = calcula_L(A) # Recalculamos el L
-        v,l,_ = ... # Encontramos el segundo autovector de L
+        v,l,_ = metpotI2(L, 1) # Encontramos el segundo autovector de L
         # Recortamos A en dos partes, la que está asociada a el signo positivo de v y la que está asociada al negativo
-        Ap = ... # Asociado al signo positivo
-        Am = ... # Asociado al signo negativo
+        Ap = np.zeros(A.shape) # Asociado al signo positivo
+        Am = np.zeros(A.shape) # Asociado al signo negativo
+        #(g) Separamos A en Ap y Am:
+        for i in range(A.shape[0]):
+            for j in range(A.shape[1]):
+                if (v[i] > 0) and (v[j] > 0):
+                    Ap[i][j] = 1
+                    Ap[j][i] = 1
+                elif (v[i] < 0) and (v[j] < 0):
+                    Am[i][j] = 1
+                    Am[j][i] = 1
         
         return(
                 laplaciano_iterativo(Ap,niveles-1,
@@ -162,19 +172,31 @@ def modularidad_iterativo(A=None,R=None,nombres_s=None):
         nombres_s = range(R.shape[0])
     # Acá empieza lo bueno
     if R.shape[0] == 1: # Si llegamos al último nivel
-        return(...)
+        return [nombres_s]
     else:
-        v,l,_ = ... # Primer autovector y autovalor de R
+        v0,l0,_0 = metpot1(A)
+        v,l,_ = metpot2(A,v0,l0) # Primer autovector y autovalor de R
         # Modularidad Actual:
         Q0 = np.sum(R[v>0,:][:,v>0]) + np.sum(R[v<0,:][:,v<0])
         if Q0<=0 or all(v>0) or all(v<0): # Si la modularidad actual es menor a cero, o no se propone una partición, terminamos
-            return(...)
+            return [nombres_s]
         else:
             ## Hacemos como con L, pero usando directamente R para poder mantener siempre la misma matriz de modularidad
-            Rp = ... # Parte de R asociada a los valores positivos de v
-            Rm = ... # Parte asociada a los valores negativos de v
-            vp,lp,_ = ...  # autovector principal de Rp
-            vm,lm,_ = ... # autovector principal de Rm
+            Ap = np.zeros(A.shape) # Asociado al signo positivo
+            Am = np.zeros(A.shape) # Asociado al signo negativo
+            for i in range(A.shape[0]):
+                for j in range(A.shape[1]):
+                    if (v[i] > 0) and (v[j] > 0):
+                        Ap[i][j] = 1
+                        Ap[j][i] = 1
+                    elif (v[i] < 0) and (v[j] < 0):
+                        Am[i][j] = 1
+                        Am[j][i] = 1
+        
+            Rp = calcula_R(Ap) # Parte de R asociada a los valores positivos de v                 
+            Rm = calcula_R(Am) # Parte asociada a los valores negativos de v                      
+            vp,lp,_ = metpot1(Rp)  # autovector principal de Rp                     
+            vm,lm,_ = metpot1(Rm) # autovector principal de Rm                      
         
             # Calculamos el cambio en Q que se produciría al hacer esta partición
             Q1 = 0
@@ -186,7 +208,10 @@ def modularidad_iterativo(A=None,R=None,nombres_s=None):
                 return([[ni for ni,vi in zip(nombres_s,v) if vi>0],[ni for ni,vi in zip(nombres_s,v) if vi<0]])
             else:
                 # Sino, repetimos para los subniveles
-                return(...)
+                return(
+                        modularidad_iterativo(A, Rp, nombres_s=[ni for ni,vi in zip(nombres_s,v) if vi>0]) +
+                        modularidad_iterativo(A, Rm, nombres_s=[ni for ni,vi in zip(nombres_s,v) if vi<0])
+                        )
 
 
 
@@ -202,3 +227,6 @@ def calcular_K(A):
                 grado += 1
         K[i,i] = grado
     return K
+
+
+print(modularidad_iterativo(A_ejemplo))
