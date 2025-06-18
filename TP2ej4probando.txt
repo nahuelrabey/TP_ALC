@@ -74,3 +74,12 @@ for i in range(len(conecciones)):
     #print(f"{len(grupos)} grupos detectados para m = {m} y nro. de niveles = {nro_niv}")
 fig.suptitle("Grupos obtenidos usando el método iterativo Laplaciano", fontsize=16)
 plt.show()
+
+
+#### Discusión sobre los resultados obtenidos
+
+En primera instancia, observamos que para el método de modularidad, a medida que aumenta la cantidad de conexiones, disminuye la cantidad de grupos.
+
+Luego, observando los gráficos del método laplaciano, y aprovechando que para el segundo y tercero la cantidad de niveles es la misma, notamos que a mayor número de conexiones se dan más casos donde un museo o un grupo de museos comparten grupo con otros que no son tan cercanos, como en el caso del museo de Chacarita que se agrupa con los ubicados en Caballito y Almagro (y otros barrios del suroeste de la Ciudad), y también el caso de los museos ubicados en San Telmo que se agrupan con los ubicados en La Boca, en vez de hacerlo con los que están en Monserrat y San Nicolás.
+
+Luego, haciendo la comparativa entre los métodos de modularidad y el Laplaciano, observamos que para la red formada con 50 conexiones entre cada museo, ambos métodos marcan la división en los barrios Balvanera, Monserrat, San Nicolás y Retiro. Sin embargo, a medida que aumenta la cantidad de grupos, más se van diferenciando el uno del otro. Esto se corresponde con la naturaleza recursiva de los métodos, ya que para el primer "paso" de partición dan resultados similares, pero las pequeñas diferencias se van acentuando con cada paso recursivo.
