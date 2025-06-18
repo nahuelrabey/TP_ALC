@@ -4,12 +4,7 @@ def simetrica_y_binaria(D, m):
     A = func.construye_adyacencia(D,m)  #Construimos matriz de adyacencia de m conexiones.
     A = (1/2) * (A + A.T)              #Simetrizamos
     A = np.ceil(A)                     #La volvemos binaria (0s y 1s) ¿¿¿ Ponemos el .astype(int) ???
-    print(A)
     return A
-
-A3 = simetrica_y_binaria(D, 3)
-print("La partición de grupos es:")
-print(tp2.modularidad_iterativo(A3))
 
 import matplotlib.colors as pltColores
 
@@ -39,17 +34,37 @@ def graficar_grupos(grupos, ax, titulo):
   # plt.show()
 
 
-conecciones = [3,5,10,50]
-alpha = 1/5
+conexiones = [3,5,10,50]
 fig, axs = plt.subplots(2,2, figsize=(15, 15))
 axs = axs.flatten()
 for i in range(len(conecciones)):
-    m = conecciones[i]
+    m = conexiones[i]
     ax = axs[i]
+    #print(f"Nueva cantidad de conexiones: {m}")
     A = simetrica_y_binaria(D, m)
     grupos = tp2.modularidad_iterativo(A)
-    titulo = f"Visualización de los subgrupos en la red, con museos con {m} conecciones"
+    titulo = f"Red de museos con {m} conexiones, obtenemos {len(grupos)} grupos"
     graficar_grupos(grupos, ax, titulo)
-    print(f"{len(grupos)} grupos detectados para m = {m}")
+    #print(f"{len(grupos)} grupos detectados para m = {m}")
+fig.suptitle("Grupos obtenidos usando el método iterativo de modularidad", fontsize=16)
+plt.show()
 
+
+conexiones = [3,5,10,50]
+#Observando los gráficos vemos en orden, para 3, 5, 10 y 50 conexiones, 15, 11, 8, y 2 subgrupos.
+#Dado que la cantidad de subgrupos es 2^(nro.niveles), elegimos 16, 8, 8 y 2 subgrupos:
+nro_niveles = [4, 3, 3, 1]
+fig, axs = plt.subplots(2,2, figsize=(15, 15))
+axs = axs.flatten()
+for i in range(len(conecciones)):
+    m = conexiones[i]
+    nro_niv = nro_niveles[i]
+    ax = axs[i]
+    #print(f"Nueva cantidad de conexiones: {m}")
+    A = simetrica_y_binaria(D, m)
+    grupos = tp2.laplaciano_iterativo(A, nro_niv)
+    titulo = f"Red de museos con {m} conexiones, pidiendo {2**nro_niv} grupos"
+    graficar_grupos(grupos, ax, titulo)
+    #print(f"{len(grupos)} grupos detectados para m = {m} y nro. de niveles = {nro_niv}")
+fig.suptitle("Grupos obtenidos usando el método iterativo Laplaciano", fontsize=16)
 plt.show()
